@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Set Your Job-Search Priorities</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ink: #1f2b29;
+    --paper: #f6f4ee;
+    --card: #ffffff;
+    --line: #e2e6de;
+    --accent: oklch(0.62 0.09 175);
+    --accent-ink: oklch(0.34 0.06 175);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--paper); color: var(--ink); }
+  h1, h2 { font-family: 'Space Grotesk', system-ui, sans-serif; }
+  button { font-family: inherit; cursor: pointer; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 999px; background: #e2e6de; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--accent); }
+  input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; box-shadow: 0 0 0 1px var(--accent); }
+  .page { max-width: 480px; margin: 0 auto; padding: 28px 24px 100px; display: flex; flex-direction: column; gap: 22px; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); }
+  .stacked-bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; border: 1px solid var(--line); background: #ece7db; }
+  .axis-row { display: flex; flex-direction: column; gap: 6px; }
+  .axis-head { display: flex; align-items: center; justify-content: space-between; }
+  .axis-label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .score-readout { font-size: 15px; font-weight: 700; color: var(--accent-ink); white-space: nowrap; }
+  .score-readout .pct { font-weight: 500; color: #5c655f; font-size: 13px; }
+  .divider { height: 1px; background: var(--line); margin: 4px 0; }
+  .seg { display: flex; gap: 8px; }
+  .seg button { flex: 1; padding: 10px 0; border-radius: 10px; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: #fff; color: var(--ink); }
+  .seg button.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .save-bar { position: sticky; bottom: 0; margin-top: 12px; padding-top: 16px; background: linear-gradient(to top, var(--paper) 60%, transparent); }
+  #save-btn { width: 100%; padding: 14px 0; border-radius: 12px; border: none; font-size: 15px; font-weight: 700; background: var(--accent); color: #fff; }
+  #save-btn.saved { background: #3a6b57; }
+  #status { text-align: center; font-size: 13px; color: #5c655f; min-height: 18px; }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 12px; color: #5c655f; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div style="display: flex; flex-direction: column; gap: 6px;">
+    <div class="eyebrow">Job search priorities</div>
+    <h1 style="margin: 0; font-size: 25px; font-weight: 700; line-height: 1.2;">Rate what matters to you</h1>
+    <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #5c655f;">Score each one from 0 to 10 - however you like, with no limit shared between them. We'll work out the percentages for you. When you're done, click Save.</p>
+  </div>
+
+  <div class="stacked-bar" id="stacked-bar"></div>
+  <div id="axes-list" style="display: flex; flex-direction: column; gap: 18px;"></div>
+
+  <div class="divider"></div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 700;">When matching you to jobs...</h2>
+    <input type="range" id="match-style" min="0" max="100" value="50" />
+    <div class="slider-labels">
+      <span>Play to my strengths</span>
+      <span>Cover more requirements</span>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <h2 style="margin: 0; font-size: 15px; font-weight: 700;">How selective should I be?</h2>
+    <div class="seg" id="selectivity">
+      <button data-value="picky">Picky</button>
+      <button data-value="balanced">Balanced</button>
+      <button data-value="generous">Generous</button>
+    </div>
+  </div>
+
+  <div class="save-bar">
+    <button id="save-btn">Save</button>
+    <div id="status"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================================
+// JAP_TEMPLATE_DATA_START
+// /js-preferences replaces everything between these two markers with the
+// candidate's real axes (from experience.json) and, on a re-edit, their
+// previously saved match style / selectivity. This fallback data is only for
+// opening the template directly to test it.
+const TEMPLATE_DATA = {
+  axes: [
+    { id: "backend", label: "Backend Development", score: 7 },
+    { id: "leadership", label: "Team Leadership", score: 5 },
+    { id: "data", label: "Data Analysis", score: 6 },
+    { id: "speaking", label: "Public Speaking", score: 3 },
+    { id: "dataviz", label: "Data Visualization", score: 5 },
+  ],
+  matchStyle: 50,
+  selectivity: "balanced",
+};
+// JAP_TEMPLATE_DATA_END
+// ============================================================================
+
+// Be forgiving about what gets seeded in above: this file is filled in by a
+// command, and a mis-seeded field should degrade gracefully rather than render
+// every slider blank and every percentage as 0%.
+function normalizeAxes(raw) {
+  const items = (raw || []).map((a) => {
+    // `score` is what this tool writes; `weight` is what experience.json calls the
+    // same number. Accept either.
+    const v = a.score !== undefined && a.score !== null ? a.score : a.weight;
+    const n = Number(v);
+    return { id: a.id, label: a.label, score: isFinite(n) ? n : 5 };
+  });
+  // Anything above 10 means these came from the older 0-100 percentage scale.
+  // Rescale proportionally so the largest becomes 10, rather than clamping every
+  // high value flat to 10 and destroying the relative ordering.
+  const max = items.reduce((m, a) => Math.max(m, a.score), 0);
+  if (max > 10) {
+    items.forEach((a) => { a.score = (a.score / max) * 10; });
+  }
+  items.forEach((a) => { a.score = Math.max(0, Math.min(10, Math.round(a.score))); });
+  return items;
+}
+
+let axes = normalizeAxes(TEMPLATE_DATA.axes);
+let matchStyle = Number(TEMPLATE_DATA.matchStyle);
+if (!isFinite(matchStyle)) matchStyle = 50;
+let selectivity = TEMPLATE_DATA.selectivity || 'balanced';
+
+function colorForIndex(i, total) {
+  const hue = total > 1 ? 140 + (i * (260 - 140)) / (total - 1) : 175;
+  return `oklch(0.62 0.09 ${hue.toFixed(1)})`;
+}
+
+function setScore(id, val) {
+  val = Math.max(0, Math.min(10, Math.round(val)));
+  axes = axes.map((a) => (a.id === id ? Object.assign({}, a, { score: val }) : a));
+}
+
+function render() {
+  const bar = document.getElementById('stacked-bar');
+  const list = document.getElementById('axes-list');
+  bar.innerHTML = '';
+  list.innerHTML = '';
+
+  const total = axes.reduce((s, a) => s + a.score, 0);
+
+  axes.forEach((a, i) => {
+    const color = colorForIndex(i, axes.length);
+    const pct = total > 0 ? Math.round((a.score / total) * 100) : 0;
+
+    const seg = document.createElement('div');
+    seg.style.width = pct + '%';
+    seg.style.background = color;
+    bar.appendChild(seg);
+
+    const row = document.createElement('div');
+    row.className = 'axis-row';
+    row.innerHTML = `
+      <div class="axis-head">
+        <span class="axis-label"><span class="dot" style="background:${color}"></span>${a.label}</span>
+        <span class="score-readout">${a.score} <span class="pct">&middot; ${pct}%</span></span>
+      </div>
+    `;
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = '0';
+    slider.max = '10';
+    slider.value = String(a.score);
+    slider.addEventListener('input', (e) => {
+      setScore(a.id, Number(e.target.value));
+      render();
+    });
+    row.appendChild(slider);
+    list.appendChild(row);
+  });
+
+  document.getElementById('match-style').value = String(matchStyle);
+  document.querySelectorAll('#selectivity button').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.value === selectivity);
+  });
+}
+
+document.getElementById('match-style').addEventListener('input', (e) => {
+  matchStyle = Number(e.target.value);
+});
+
+document.getElementById('selectivity').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  selectivity = btn.dataset.value;
+  render();
+});
+
+document.getElementById('save-btn').addEventListener('click', () => {
+  const axisScores = {};
+  // Coerce explicitly: JSON.stringify drops keys whose value is undefined, so an
+  // axis with a bad score would vanish from the saved file with no error at all.
+  axes.forEach((a) => {
+    axisScores[a.id] = Number.isFinite(a.score) ? a.score : 0;
+  });
+  const payload = {
+    axis_scores: axisScores,
+    match_style: matchStyle,
+    selectivity: selectivity,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'job-search-priorities.json';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Saved';
+  btn.classList.add('saved');
+  document.getElementById('status').textContent = 'Saved to your inbox folder - you can close this page.';
+});
+
+render();
+</script>
+</body>
+</html>
