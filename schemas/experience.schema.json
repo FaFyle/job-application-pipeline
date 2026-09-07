@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Job Application Pipeline - candidate experience knowledge base",
+  "description": "Written by /js-interview. This is the grounding source of truth for every CV, cover letter, and prep report the pipeline generates - nothing goes on a generated document that isn't traceable to a skill entry here or the candidate's own source CV.",
+  "type": "object",
+  "required": ["meta", "identity", "axes", "experiences"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["status", "last_updated", "sections_covered"],
+      "properties": {
+        "status": { "enum": ["in_progress", "complete"] },
+        "last_updated": { "type": "string", "format": "date" },
+        "source_cv_path": { "type": "string" },
+        "sections_covered": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Experience ids already fully interviewed - used to resume across sessions."
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "description": "Extracted from the candidate's source CV, not re-asked during the interview unless missing or unclear.",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "location": { "type": "string" },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["label", "url"],
+            "properties": {
+              "label": { "type": "string" },
+              "url": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "axes": {
+      "type": "array",
+      "description": "Skill groupings used for job-fit scoring priority weights (set later via /js-preferences). Created here as skills are discovered; kept to a manageable number (roughly 5-10) rather than one axis per skill.",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "weight"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "weight": {
+            "type": "number",
+            "minimum": 0,
+            "description": "A RELATIVE priority score on a 0-10 scale, set via the priority-weighting tool in /js-preferences; 0 until then. These are deliberately NOT percentages and do NOT sum to 100 - job-fit scoring uses them multiplicatively as relative weights, so only their ratios matter. Never renormalize them to sum to 100 (an earlier version of the tool did store percentages, so values above 10 indicate legacy data that should be rescaled proportionally to 0-10, which the weighting tool does automatically)."
+          }
+        }
+      }
+    },
+    "experiences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "type", "skills"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "type": { "enum": ["role", "project", "education", "certification", "volunteer", "other"] },
+          "organization": { "type": "string" },
+          "period": {
+            "type": "object",
+            "properties": {
+              "start": { "type": "string", "description": "YYYY-MM or YYYY" },
+              "end": { "type": "string", "description": "YYYY-MM, YYYY, or 'present'" }
+            }
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text summary of the role/project context."
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "skill_key", "axis_id", "confidence_1_10", "evidence", "source"],
+              "properties": {
+                "name": { "type": "string" },
+                "skill_key": {
+                  "type": "string",
+                  "description": "Stable identifier for the underlying skill (lowercase, hyphenated, e.g. 'gazebo-simulation'), distinct from `name`. When the same underlying skill recurs across different experiences, every occurrence shares this key so scoring and CV generation can look across all of them together - while `name` and the rest of the fields stay specific to that one experience's context, since the same skill often reads differently in a different job."
+                },
+                "axis_id": { "type": "string" },
+                "duration_months": { "type": ["number", "null"] },
+                "frequency": {
+                  "type": ["string", "null"],
+                  "description": "Free text, e.g. 'daily', 'weekly', 'a handful of times total'."
+                },
+                "times_repeated": { "type": ["number", "null"] },
+                "confidence_1_10": { "type": "integer", "minimum": 1, "maximum": 10 },
+                "evidence": {
+                  "type": "string",
+                  "description": "A concrete, specific, defensible statement the candidate could repeat in an interview - not a generic claim."
+                },
+                "source": { "enum": ["interview", "cv"] }
+              }
+            }
+          },
+          "raw_notes": {
+            "type": "string",
+            "description": "Free-text interview notes for this experience, kept for context even if not all of it becomes a CV bullet."
+          }
+        }
+      }
+    }
+  }
+}
