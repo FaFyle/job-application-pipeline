@@ -94,10 +94,13 @@ Write `candidate/preferences.json` with these fields:
 3. Tell the candidate to open `<data_root>/candidate/priority-weighting.html`
    (double-clicking it works - no server needed), adjust things, click Save, and then
    tell you when they're done.
-4. Once they confirm, look for `job-search-priorities.json` in their OS Downloads
-   folder (the default location - if it isn't there, ask where their browser saves
-   downloads). If more than one match exists, use the most recently modified one.
-   Read it - it has this shape:
+4. Once they confirm, look for `job-search-priorities.json` in `<data_root>/inbox/`
+   - **only there, never their real Downloads folder** (see
+   `skills/pipeline-safety/SKILL.md`). If it isn't there, remind them their browser's
+   download location should point at the inbox, or they can move the file across by
+   hand; don't go looking for it elsewhere. If several copies exist (browsers add a
+   `(2)` suffix rather than overwriting), use the most recently modified one and say
+   which. Read it - it has this shape:
    ```json
    { "axis_scores": { "<axis id>": 0-10, ... }, "match_style": 0-100, "selectivity": "picky|balanced|generous" }
    ```

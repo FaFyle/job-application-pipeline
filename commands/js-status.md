@@ -32,8 +32,14 @@ things the way you would to someone who has never used Claude Code before.
    2. Missing `preferences.json` or `scoring-config.json` -> recommend `/js-preferences`
    3. Missing templates -> recommend `/js-templates`
    4. Everything above present, no scans yet -> recommend `/js-scan`
-   5. Everything present -> tell them the pipeline is fully set up, and `/js-scan`
+   5. A scan exists with prioritized jobs that have no `cv.docx` in their folder ->
+      recommend `/js-generate`
+   6. Everything present -> tell them the pipeline is fully set up, and `/js-scan`
       can be re-run any time to search for new jobs.
+
+   Check `<data_root>/inbox/` too, at any stage: if something is sitting there
+   unapplied, mention it and point at `/js-apply` - a candidate who saved from a page
+   and then closed it has no other way to discover the file was never picked up.
 5. If a command referenced above doesn't exist yet in the installed version of this
    plugin, say so plainly (e.g. "not built yet - that's a later phase") rather than
    trying to invoke it.
