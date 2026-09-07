@@ -1,0 +1,20 @@
+{
+  "name": "job-application-pipeline-marketplace",
+  "description": "Self-hosted marketplace for the job-application-pipeline plugin.",
+  "owner": {
+    "name": "TODO: your name",
+    "email": "TODO: your email"
+  },
+  "plugins": [
+    {
+      "name": "job-application-pipeline",
+      "description": "Automates job-application prep: a one-time interview to capture quantified experience, CV/cover-letter template design, and a schedulable job search that ranks postings against your priorities and drafts tailored applications for the ones worth pursuing. Never submits an application on its own.",
+      "version": "0.10.1",
+      "source": "./",
+      "author": {
+        "name": "TODO: your name",
+        "email": "TODO: your email"
+      }
+    }
+  ]
+}

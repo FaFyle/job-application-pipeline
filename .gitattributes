@@ -1,0 +1,13 @@
+# Normalize to LF in the repository; check out native on Windows.
+# Without this, a repo authored on Windows lands in every Linux/macOS clone with
+# CRLF line endings and every diff looks like the whole file changed.
+* text=auto eol=lf
+
+# PowerShell is happier with CRLF on disk.
+*.ps1 text eol=crlf
+
+# Binary - never touch these.
+*.docx binary
+*.pdf  binary
+*.png  binary
+*.jpg  binary

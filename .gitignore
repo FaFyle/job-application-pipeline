@@ -1,0 +1,18 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Python (the docx rendering scripts)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Never commit candidate data or rendered output. All runtime data lives in the
+# candidate's own data folder, outside this repo - these patterns are a backstop
+# in case something is ever generated here by mistake.
+*.pdf
+*.docx
+page*.png
+inbox/
