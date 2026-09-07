@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Job Application Pipeline - job fit score breakdown",
+  "description": "Written by /js-scan, one per job posting. Deliberately stores the full reasoning, not just the number: the dashboard shows why a job scored what it did, and the prep report reuses matched requirements as 'aligned with your profile' and unmatched ones as 'potential gaps'.",
+  "type": "object",
+  "required": ["job_id", "scored_at", "score", "tier", "prioritized", "coverage_pct", "depth_pct", "matched_requirements", "unmatched_requirements"],
+  "properties": {
+    "job_id": { "type": "string" },
+    "scored_at": { "type": "string", "format": "date" },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "coverage_weight * coverage_pct + depth_weight * depth_pct, using the weights in scoring-config.json."
+    },
+    "tier": { "type": "string", "description": "Label from scoring-config.json's tier_bands, e.g. Strong/Possible/Weak." },
+    "prioritized": {
+      "type": "boolean",
+      "description": "score >= prioritized_threshold, unless overridden. A prioritized job gets full CV/cover-letter/prep-report generation; others are saved with their posting and score only."
+    },
+    "override": {
+      "type": ["string", "null"],
+      "enum": ["forced_prioritized", "forced_skipped", null],
+      "description": "Set when the candidate flips this job's flag in the dashboard, so a re-scan doesn't silently undo their decision."
+    },
+    "coverage_pct": {
+      "type": "number",
+      "description": "Weighted fraction of the posting's requirements matched, required items counting required_multiplier and nice-to-haves nice_to_have_multiplier."
+    },
+    "depth_pct": {
+      "type": "number",
+      "description": "Average of (confidence_1_10/10 * axis weight, normalized against the candidate's highest axis weight) across matched requirements only. 0 when nothing matched."
+    },
+    "matched_requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirement", "required", "skill_key", "confidence_1_10"],
+        "properties": {
+          "requirement": { "type": "string", "description": "The requirement as the posting words it." },
+          "required": { "type": "boolean", "description": "true = must-have per the posting's own language; false = nice-to-have." },
+          "skill_key": { "type": "string", "description": "The matching skill in experience.json. All experiences sharing this key count as evidence for this one requirement." },
+          "matching_experience_ids": { "type": "array", "items": { "type": "string" } },
+          "axis_id": { "type": "string" },
+          "confidence_1_10": { "type": "integer", "minimum": 1, "maximum": 10, "description": "Highest confidence among the entries sharing this skill_key." }
+        }
+      }
+    },
+    "unmatched_requirements": {
+      "type": "array",
+      "description": "Requirements with no honest match in experience.json. These become the prep report's 'potential gaps' - never quietly dropped.",
+      "items": {
+        "type": "object",
+        "required": ["requirement", "required"],
+        "properties": {
+          "requirement": { "type": "string" },
+          "required": { "type": "boolean" },
+          "note": { "type": "string", "description": "Optional: why it didn't match, e.g. 'adjacent to his ROS1 work but not the same tool'." }
+        }
+      }
+    }
+  }
+}

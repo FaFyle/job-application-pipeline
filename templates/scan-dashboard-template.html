@@ -1,0 +1,418 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Job Scan Results</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&amp;family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ink: #1f2b29;
+    --muted: #5c655f;
+    --paper: #f6f4ee;
+    --card: #ffffff;
+    --line: #e2e6de;
+    --accent: oklch(0.62 0.09 175);
+    --accent-ink: oklch(0.34 0.06 175);
+    --depth: oklch(0.62 0.09 250);
+    --strong: oklch(0.52 0.11 150);
+    --possible: oklch(0.55 0.13 70);
+    --weak: oklch(0.50 0.07 30);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--paper); color: var(--ink); }
+  h1, h2, h3 { font-family: 'Space Grotesk', system-ui, sans-serif; }
+  button { font-family: inherit; cursor: pointer; }
+  a { color: var(--accent-ink); text-decoration: none; }
+  a:hover { color: var(--ink); text-decoration: underline; }
+
+  .page { max-width: 1180px; margin: 0 auto; padding: 26px 26px 96px; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); }
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .head h1 { margin: 4px 0 0; font-size: 25px; font-weight: 700; }
+  .stats { display: flex; gap: 10px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 16px; }
+  .stat .n { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 20px; font-weight: 700; }
+  .stat .l { font-size: 11px; color: var(--muted); }
+
+  .filters { display: flex; gap: 8px; margin: 18px 0 12px; flex-wrap: wrap; }
+  .filters button { padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: #fff; color: var(--ink); }
+  .filters button.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+  .split { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 18px; align-items: start; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; } .rail { max-height: 320px; } }
+
+  .rail { display: flex; flex-direction: column; gap: 8px; max-height: 72vh; overflow-y: auto; padding-right: 4px; }
+  .row { background: transparent; border: 1px solid var(--line); border-radius: 12px; padding: 11px 13px; display: flex; gap: 12px; align-items: center; text-align: left; width: 100%; }
+  .row.active { background: var(--card); border-color: var(--accent); }
+  .row.dim { opacity: 0.55; }
+  .row .chip { width: 40px; height: 40px; border-radius: 10px; color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+  .row .rt { min-width: 0; }
+  .row .rr { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .rc { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .detail { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; display: flex; flex-direction: column; gap: 18px; }
+  .detail-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; flex-wrap: wrap; }
+  .detail-head h2 { margin: 0 0 4px; font-size: 21px; font-weight: 700; }
+  .sub { font-size: 14px; color: var(--muted); }
+  .flag { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; margin-top: 8px; }
+  .flag.prio { background: oklch(0.93 0.05 150); color: oklch(0.34 0.09 150); }
+  .flag.not { background: #efeae1; color: #635c51; }
+  .flag.ovr { background: oklch(0.93 0.05 280); color: oklch(0.34 0.09 280); }
+  .score-badge { text-align: center; border-radius: 12px; padding: 12px 16px; color: #fff; min-width: 88px; }
+  .score-badge .s { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 26px; font-weight: 700; line-height: 1; }
+  .score-badge .t { font-size: 11px; font-weight: 600; margin-top: 4px; }
+
+  .bars { display: flex; flex-direction: column; gap: 7px; }
+  .barline { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  .track { height: 7px; border-radius: 999px; background: #efeae1; overflow: hidden; }
+  .track > div { height: 100%; }
+
+  .reqs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+  @media (max-width: 700px) { .reqs { grid-template-columns: 1fr; } }
+  .reqs h3 { margin: 0 0 8px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .reqs .ok { color: oklch(0.42 0.10 150); }
+  .reqs .gap { color: oklch(0.45 0.12 60); }
+  .req { padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 13px; }
+  .req:last-child { border-bottom: none; }
+  .req .must { font-size: 10px; font-weight: 700; color: oklch(0.50 0.14 30); margin-left: 6px; }
+  .req .ev { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .none { font-size: 13px; color: var(--muted); font-style: italic; }
+
+  .foot { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; }
+  .foot .spacer { flex-grow: 1; }
+  .foot button { padding: 9px 14px; border-radius: 9px; font-size: 12px; font-weight: 600; border: 1px solid var(--line); background: #fff; color: var(--ink); }
+  .foot button:hover { border-color: var(--accent); }
+  .meta { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+  .meta .item { display: flex; align-items: center; gap: 6px; }
+
+  .save-bar { position: fixed; left: 0; right: 0; bottom: 0; background: linear-gradient(to top, var(--paper) 70%, transparent); padding: 14px 26px 18px; }
+  .save-inner { max-width: 1180px; margin: 0 auto; display: flex; gap: 12px; align-items: center; }
+  #save-btn { flex: 1; padding: 13px 0; border-radius: 12px; border: none; font-size: 15px; font-weight: 700; background: var(--accent); color: #fff; }
+  #save-btn.saved { background: #3a6b57; }
+  #save-btn:disabled { background: #d8d3c8; color: #7c7568; cursor: default; }
+  #status { font-size: 13px; color: var(--muted); }
+  .empty { background: var(--card); border: 1px dashed var(--line); border-radius: 14px; padding: 30px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="eyebrow">Job scan</div>
+  <div class="head">
+    <h1 id="title">Results</h1>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="filters" id="filters">
+    <button data-f="all" class="active">All</button>
+    <button data-f="prio">Worth applying to</button>
+    <button data-f="not">The rest</button>
+  </div>
+
+  <div class="split">
+    <div class="rail" id="rail"></div>
+    <div id="detail"></div>
+  </div>
+</div>
+
+<div class="save-bar">
+  <div class="save-inner">
+    <button id="save-btn" disabled>No changes to save</button>
+    <span id="status"></span>
+  </div>
+</div>
+
+<script>
+// ============================================================================
+// JAP_SCAN_DATA_START
+// /js-scan replaces everything between these two markers. Shape (field names matter):
+//   scan_date: "YYYY-MM-DD"
+//   jobs: [{
+//     job_id, company, role, location, source_url, posted_date|null, language,
+//     score (0-100), tier, prioritized (bool), override ("forced_prioritized"|"forced_skipped"|null),
+//     coverage_pct, depth_pct, commute_url, folder,
+//     matched:   [{ requirement, required (bool), skill_key, confidence_1_10, experiences (count) }],
+//     unmatched: [{ requirement, required (bool), note }]
+//   }]
+// The sample below is only so the template can be opened directly to check it renders.
+const SCAN_DATA = {
+  scan_date: "2026-09-06",
+  jobs: [
+    {
+      job_id: "sample-1", company: "Example Robotics AG", role: "Robotics Engineer",
+      location: "Shelbyville, Anystate", source_url: "https://example.com/job/1",
+      posted_date: "2026-09-02", language: "en",
+      score: 78, tier: "Possible", prioritized: true, override: null,
+      coverage_pct: 72, depth_pct: 84,
+      commute_url: "https://www.google.com/maps/dir/?api=1&origin=Springfield&destination=Shelbyville",
+      folder: "applications/example-robotics-engineer",
+      matched: [
+        { requirement: "Experience with ROS2", required: true, skill_key: "ros2", confidence_1_10: 7, experiences: 1 },
+        { requirement: "Simulation experience (Gazebo)", required: true, skill_key: "gazebo-simulation", confidence_1_10: 7, experiences: 2 }
+      ],
+      unmatched: [
+        { requirement: "5+ years industry experience", required: true, note: "Academic and project experience only so far." },
+        { requirement: "C++ in production", required: false, note: "Adjacent to embedded C, but not the same language." }
+      ]
+    }
+  ]
+};
+// JAP_SCAN_DATA_END
+// ============================================================================
+
+// Be forgiving about what gets injected above - a mis-seeded field should degrade
+// visibly rather than render a blank page.
+function num(v, fallback) { const n = Number(v); return isFinite(n) ? n : fallback; }
+function normalizeJobs(raw) {
+  return (raw || []).filter(function (j) {
+    // Skip null/garbage entries rather than letting one bad row blank the page.
+    return j && typeof j === 'object';
+  }).map(function (j, i) {
+    return {
+      job_id: j.job_id || ('job-' + i),
+      company: j.company || 'Unknown company',
+      role: j.role || 'Untitled role',
+      location: j.location || '',
+      source_url: j.source_url || '',
+      posted_date: j.posted_date || null,
+      language: j.language || '',
+      score: Math.max(0, Math.min(100, num(j.score, 0))),
+      tier: j.tier || '',
+      prioritized: !!j.prioritized,
+      override: j.override || null,
+      coverage_pct: Math.max(0, Math.min(100, num(j.coverage_pct, 0))),
+      depth_pct: Math.max(0, Math.min(100, num(j.depth_pct, 0))),
+      commute_url: j.commute_url || '',
+      folder: j.folder || '',
+      matched: Array.isArray(j.matched) ? j.matched : [],
+      unmatched: Array.isArray(j.unmatched) ? j.unmatched : []
+    };
+  }).sort(function (a, b) { return b.score - a.score; });
+}
+
+const jobs = normalizeJobs(SCAN_DATA.jobs);
+const scanDate = SCAN_DATA.scan_date || '';
+const originalOverrides = {};
+jobs.forEach(function (j) { originalOverrides[j.job_id] = j.override; });
+let filter = 'all';
+let selectedId = jobs.length ? jobs[0].job_id : null;
+// A job you just prioritized or skipped stays visible until you change filter -
+// otherwise it vanishes the instant you act on it, taking its undo button with it.
+let stickyIds = {};
+
+function isPrioritized(j) {
+  if (j.override === 'forced_prioritized') return true;
+  if (j.override === 'forced_skipped') return false;
+  return j.prioritized;
+}
+function tierColor(j) {
+  const t = (j.tier || '').toLowerCase();
+  if (t.indexOf('strong') === 0) return 'var(--strong)';
+  if (t.indexOf('possible') === 0) return 'var(--possible)';
+  return 'var(--weak)';
+}
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function dirty() {
+  return jobs.some(function (j) { return j.override !== originalOverrides[j.job_id]; });
+}
+function visibleJobs() {
+  return jobs.filter(function (j) {
+    if (stickyIds[j.job_id]) return true;
+    if (filter === 'prio') return isPrioritized(j);
+    if (filter === 'not') return !isPrioritized(j);
+    return true;
+  });
+}
+const ICON = {
+  pin: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+  clock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>'
+};
+
+function flagFor(j) {
+  if (j.override) {
+    return '<span class="flag ovr">' + (j.override === 'forced_prioritized' ? 'you prioritized this' : 'you skipped this') + '</span>';
+  }
+  return isPrioritized(j)
+    ? '<span class="flag prio">worth applying to</span>'
+    : '<span class="flag not">not prioritized</span>';
+}
+
+function renderRail() {
+  const shown = visibleJobs();
+  const rail = document.getElementById('rail');
+  if (!shown.length) {
+    rail.innerHTML = '<div class="empty">Nothing in this view.</div>';
+    return;
+  }
+  rail.innerHTML = shown.map(function (j) {
+    const active = j.job_id === selectedId;
+    // A selected row is never dimmed - otherwise the selection highlight fights
+    // the dim and the selected job reads as the least important one.
+    const dim = (!active && !isPrioritized(j)) ? ' dim' : '';
+    return '<button class="row' + (active ? ' active' : '') + dim + '" data-id="' + esc(j.job_id) + '">' +
+      '<span class="chip" style="background:' + tierColor(j) + '">' + Math.round(j.score) + '</span>' +
+      '<span class="rt">' +
+        '<span class="rr">' + esc(j.role) + '</span>' +
+        '<span class="rc">' + esc(j.company) + (j.location ? ' &middot; ' + esc(j.location) : '') + '</span>' +
+      '</span>' +
+    '</button>';
+  }).join('');
+}
+
+function renderDetail() {
+  const el = document.getElementById('detail');
+  const shown = visibleJobs();
+  const j = jobs.filter(function (x) { return x.job_id === selectedId; })[0];
+  if (!j || !shown.length) {
+    el.innerHTML = '<div class="empty">Select a job on the left to see why it scored what it did.</div>';
+    return;
+  }
+
+  const meta = []
+    .concat(j.location ? ['<span class="item">' + ICON.pin + esc(j.location) + '</span>'] : [])
+    .concat(j.posted_date ? ['<span class="item">' + ICON.clock + 'posted ' + esc(j.posted_date) + '</span>'] : [])
+    .concat(j.language ? ['<span class="item">' + esc(j.language.toUpperCase()) + '</span>'] : [])
+    .concat(j.commute_url ? ['<a href="' + esc(j.commute_url) + '" target="_blank" rel="noopener">commute</a>'] : [])
+    .concat(j.source_url ? ['<a href="' + esc(j.source_url) + '" target="_blank" rel="noopener">original posting</a>'] : [])
+    .concat(j.folder ? ['<a href="' + esc(j.folder) + '" target="_blank">files</a>'] : [])
+    .join('');
+
+  const matched = j.matched.length
+    ? j.matched.map(function (m) {
+        const acrossN = num(m.experiences, 0);
+        return '<div class="req">' + esc(m.requirement) +
+          (m.required ? '<span class="must">MUST</span>' : '') +
+          '<div class="ev">your ' + esc(m.skill_key || 'experience') +
+          (m.confidence_1_10 ? ', confidence ' + esc(m.confidence_1_10) + '/10' : '') +
+          (acrossN > 1 ? ', across ' + acrossN + ' experiences' : '') +
+          '</div></div>';
+      }).join('')
+    : '<div class="none">Nothing in this posting matched your profile.</div>';
+
+  const gaps = j.unmatched.length
+    ? j.unmatched.map(function (u) {
+        return '<div class="req">' + esc(u.requirement) +
+          (u.required ? '<span class="must">MUST</span>' : '') +
+          (u.note ? '<div class="ev">' + esc(u.note) + '</div>' : '') +
+          '</div>';
+      }).join('')
+    : '<div class="none">Nothing missing.</div>';
+
+  el.innerHTML =
+    '<div class="detail">' +
+      '<div class="detail-head">' +
+        '<div>' +
+          '<h2>' + esc(j.role) + '</h2>' +
+          '<div class="sub">' + esc(j.company) + '</div>' +
+          flagFor(j) +
+        '</div>' +
+        '<div class="score-badge" style="background:' + tierColor(j) + '">' +
+          '<div class="s">' + Math.round(j.score) + '</div>' +
+          '<div class="t">' + esc(j.tier) + '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="meta">' + meta + '</div>' +
+      '<div class="bars">' +
+        '<div class="barline"><span>Coverage &mdash; how much of the posting you cover</span><span>' + Math.round(j.coverage_pct) + '%</span></div>' +
+        '<div class="track"><div style="width:' + Math.round(j.coverage_pct) + '%;background:var(--accent)"></div></div>' +
+        '<div class="barline" style="margin-top:6px"><span>Depth &mdash; how strong you are in what matched</span><span>' + Math.round(j.depth_pct) + '%</span></div>' +
+        '<div class="track"><div style="width:' + Math.round(j.depth_pct) + '%;background:var(--depth)"></div></div>' +
+      '</div>' +
+      '<div class="reqs">' +
+        '<div><h3 class="ok">Aligned with your profile</h3>' + matched + '</div>' +
+        '<div><h3 class="gap">Gaps to be ready for</h3>' + gaps + '</div>' +
+      '</div>' +
+      '<div class="foot">' +
+        '<button data-act="prio" data-id="' + esc(j.job_id) + '">Apply to this one</button>' +
+        '<button data-act="skip" data-id="' + esc(j.job_id) + '">Skip this one</button>' +
+        (j.override ? '<button data-act="reset" data-id="' + esc(j.job_id) + '">Undo my change</button>' : '') +
+      '</div>' +
+    '</div>';
+}
+
+function render() {
+  document.getElementById('title').textContent = 'Results from ' + (scanDate || 'this scan');
+  const prio = jobs.filter(isPrioritized).length;
+  document.getElementById('stats').innerHTML =
+    '<div class="stat"><div class="n">' + jobs.length + '</div><div class="l">postings found</div></div>' +
+    '<div class="stat"><div class="n">' + prio + '</div><div class="l">worth applying to</div></div>' +
+    '<div class="stat"><div class="n">' + (jobs.length - prio) + '</div><div class="l">saved, not prioritized</div></div>';
+
+  const shown = visibleJobs();
+  if (shown.length && !shown.some(function (j) { return j.job_id === selectedId; })) {
+    selectedId = shown[0].job_id;
+  }
+
+  renderRail();
+  renderDetail();
+
+  const btn = document.getElementById('save-btn');
+  const changed = dirty();
+  btn.disabled = !changed;
+  btn.classList.remove('saved');
+  btn.textContent = changed ? 'Save my changes' : 'No changes to save';
+}
+
+document.getElementById('filters').addEventListener('click', function (e) {
+  const b = e.target.closest('button');
+  if (!b) return;
+  filter = b.dataset.f;
+  stickyIds = {};
+  Array.prototype.forEach.call(this.querySelectorAll('button'), function (x) {
+    x.classList.toggle('active', x === b);
+  });
+  render();
+});
+
+document.getElementById('rail').addEventListener('click', function (e) {
+  const b = e.target.closest('button[data-id]');
+  if (!b) return;
+  selectedId = b.dataset.id;
+  render();
+});
+
+document.getElementById('detail').addEventListener('click', function (e) {
+  const b = e.target.closest('button[data-act]');
+  if (!b) return;
+  const j = jobs.filter(function (x) { return x.job_id === b.dataset.id; })[0];
+  if (!j) return;
+  if (b.dataset.act === 'prio') j.override = 'forced_prioritized';
+  if (b.dataset.act === 'skip') j.override = 'forced_skipped';
+  if (b.dataset.act === 'reset') j.override = null;
+  // An override that just restores the default is not a change worth saving.
+  if (j.override === 'forced_prioritized' && j.prioritized) j.override = null;
+  if (j.override === 'forced_skipped' && !j.prioritized) j.override = null;
+  stickyIds[j.job_id] = true;
+  render();
+});
+
+document.getElementById('save-btn').addEventListener('click', function () {
+  const overrides = {};
+  jobs.forEach(function (j) {
+    if (j.override !== originalOverrides[j.job_id]) overrides[j.job_id] = j.override;
+  });
+  const payload = { scan_date: scanDate, overrides: overrides };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'scan-overrides.json';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Saved';
+  btn.classList.add('saved');
+  btn.disabled = true;
+  document.getElementById('status').textContent = 'Saved to your inbox folder - tell Claude and it will apply your changes.';
+});
+
+render();
+</script>
+</body>
+</html>
