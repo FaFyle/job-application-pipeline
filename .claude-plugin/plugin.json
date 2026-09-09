@@ -3,11 +3,11 @@
   "description": "Automates job-application prep: a one-time interview to capture quantified experience, CV/cover-letter template design, and a schedulable job search that ranks postings against your priorities and drafts tailored applications for the ones worth pursuing. Never submits an application on its own.",
   "version": "0.13.0",
   "author": {
-    "name": "TODO: your name",
-    "email": "TODO: your email"
+    "name": "Fahradin Mujovi",
+    "email": "49496148+FaFyle@users.noreply.github.com"
   },
-  "homepage": "https://github.com/TODO-your-username/job-application-pipeline",
-  "repository": "https://github.com/TODO-your-username/job-application-pipeline",
+  "homepage": "https://github.com/FaFyle/job-application-pipeline",
+  "repository": "https://github.com/FaFyle/job-application-pipeline",
   "license": "MIT",
   "keywords": [
     "job-search",

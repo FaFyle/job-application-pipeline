@@ -2,8 +2,8 @@
   "name": "job-application-pipeline-marketplace",
   "description": "Self-hosted marketplace for the job-application-pipeline plugin.",
   "owner": {
-    "name": "TODO: your name",
-    "email": "TODO: your email"
+    "name": "Fahradin Mujovi",
+    "email": "49496148+FaFyle@users.noreply.github.com"
   },
   "plugins": [
     {
@@ -12,8 +12,8 @@
       "version": "0.13.0",
       "source": "./",
       "author": {
-        "name": "TODO: your name",
-        "email": "TODO: your email"
+        "name": "Fahradin Mujovi",
+        "email": "49496148+FaFyle@users.noreply.github.com"
       }
     }
   ]

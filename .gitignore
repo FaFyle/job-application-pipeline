@@ -16,3 +16,8 @@ venv/
 *.docx
 page*.png
 inbox/
+
+# Local Claude Code config. Holds absolute machine paths and per-user settings -
+# never useful to a clone, and a quiet way to leak a home directory.
+.claude/
+.claude/settings.local.json

@@ -133,7 +133,7 @@ For a **change request or improvement**:
 ```
 
 The "checked during this conversation" section matters: it shows the author the triage
-that already happened so he doesn't repeat it. Keep it factual and short.
+that already happened so they don't repeat it. Keep it factual and short.
 
 Write only what the person actually said. Do not invent reproduction steps, infer an
 impact they didn't describe, or smooth a vague answer into a confident one - a
