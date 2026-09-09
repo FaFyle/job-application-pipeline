@@ -69,6 +69,14 @@ move it there or re-save; don't go looking.
 The same applies to anything else this pipeline reads: stay inside `<data_root>` and
 the specific file the candidate names.
 
+**`/js-feedback` is the exception in the other direction: it reads nothing inside the
+data folder at all** - not `candidate/`, not `scans/`, not `templates/`. A feedback
+report may end up pasted into a public GitHub issue, and the data folder holds CVs,
+employer names, contact details and applications. The report carries what the person
+typed plus the plugin version, so nothing personal can reach a public issue by
+construction rather than by anyone remembering to check. If a detail from their files
+would help, ask them to paste it and let them decide.
+
 ## Credentials
 
 No command or skill in this plugin ever asks for, stores, or uses login credentials

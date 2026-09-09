@@ -38,6 +38,15 @@ Run `/js-setup` once to choose where your private data folder lives, then run
 `/js-status` any time — it looks at what you've done so far and tells you what to do
 next.
 
+## Something wrong, or an idea?
+
+Run `/js-feedback`. It asks what happened, checks the obvious causes first (an
+out-of-date install explains a surprising amount), and if there's a real problem it
+writes a report you can send on or paste into a GitHub issue.
+
+It never reads anything in your data folder — the report contains what you type and
+the plugin version, nothing else — so you can share it without checking what's in it.
+
 ## Status
 
 Under active, incremental development. See the project's implementation plan for the
