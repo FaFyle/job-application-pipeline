@@ -66,7 +66,12 @@ machine.
    downloaded file into `<data-root>/inbox/` by hand each time - it works the same,
    it's just an extra step.
 6. Confirm success to the candidate in plain language: where their data folder is, and
-   that the next step is to run `/js-status` to see what to do next.
+   what happens next.
+
+   If they arrived here from `/js-guide`, just hand back to it - don't send them off
+   to type something. If they ran `/js-setup` directly, tell them `/js-guide` will
+   walk them through the rest and is the only command they need to remember, with
+   `/js-status` as a quick checklist if they prefer driving themselves.
 
 ## Notes for whoever implements later phases
 

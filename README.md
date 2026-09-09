@@ -34,9 +34,14 @@ claude plugin install job-application-pipeline@job-application-pipeline-marketpl
 
 ## Getting started
 
-Run `/js-setup` once to choose where your private data folder lives, then run
-`/js-status` any time — it looks at what you've done so far and tells you what to do
-next.
+Run **`/js-guide`**. That's the only command you need to know — it works out where you
+are, tells you what's next in plain language, and runs each step for you. Run it again
+any time to pick up where you left off.
+
+If you'd rather drive it yourself, the individual commands are all there:
+`/js-setup`, `/js-interview`, `/js-preferences`, `/js-templates`, `/js-scan`,
+`/js-generate`, `/js-apply`, and `/js-status` for a quick checklist of where things
+stand.
 
 ## Something wrong, or an idea?
 
