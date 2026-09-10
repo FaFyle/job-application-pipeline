@@ -32,27 +32,94 @@ Check whether `<data_root>/candidate/experience.json` exists.
 
 ## Fresh start
 
-1. Ask for the candidate's CV - a file path, or they can paste the text directly.
-   Read it.
-2. Extract identity fields (name, email, phone, location, links such as LinkedIn) from
-   the CV text into an `identity` object. Don't ask about these unless something
-   important is missing or ambiguous.
-3. Extract a skeleton list of experiences (roles, projects, education, certifications)
-   from the CV: title, organization, type, and period for each, in the order they
-   appear. Give each a stable id (`exp-001`, `exp-002`, ...). Leave `skills` empty for
-   now - that's what the interview fills in.
-4. Write the initial `experience.json`: `meta.status` = `"in_progress"`,
-   `meta.sections_covered` = `[]`, `identity` filled in, `axes` = `[]`, `experiences` =
-   the skeleton above. **Write any path (e.g. `meta.source_cv_path`) with forward
-   slashes** - see `skills/pipeline-safety/SKILL.md`.
-5. Tell the candidate what you found (e.g. "I found 6 things on your CV: ... - I'll go
-   through each one to really understand it. We can stop anytime and pick back up
-   later."), then start the interview loop with the first experience.
+### Step 1 — read everything they've given you
+
+Look in `<data_root>/source-documents/`. The candidate is asked to drop **all** their
+CVs and cover letters there, not just one, because people write different experiences
+into different CVs depending on the job they were chasing. Reading them all is the
+difference between starting from what they have and starting from whichever file they
+happened to mention.
+
+- **Readable**: `.docx` (via `python-docx`), `.txt`, `.md`.
+- **Not readable here**: `.pdf`. Say so by name and ask for a re-save as `.docx` or a
+  paste. **Never silently skip a file** - the candidate put it there believing it
+  would be used, and a quietly ignored CV is the worst outcome of this whole step.
+- Classify each document as a CV or a cover letter **by its content, not its
+  filename**.
+- If the folder is empty, explain where to put documents and offer to wait. Don't
+  block permanently: someone may genuinely have no CV, and the interview can run from
+  nothing.
+
+Say what you read, in a line: how many CVs, how many cover letters, anything skipped.
+
+### Step 2 — union the experiences, and record where each came from
+
+Build one skeleton from **all** the CVs together:
+
+- An experience appearing in any CV gets an entry. One appearing in several gets
+  merged into a single entry, not duplicated.
+- Give each a stable id (`exp-001`, ...), with title, organization, type and period.
+  Leave `skills` empty - the interview fills those.
+- Set `source_documents` on each entry: which files it came from. An experience that
+  appears on only one CV is a signal worth keeping - they judged it irrelevant for
+  the others - and it helps later tailoring decide what to include for a given job.
+
+### Step 3 — note the conflicts, but don't ask yet
+
+Several CVs will disagree. Sort the disagreements:
+
+- **Material** - things that cannot both be true: dates, job titles, employer names,
+  quantified results, qualification dates. Record these and **raise each one during
+  that experience's turn in the interview loop**, not as a batch now. A wall of
+  contradictions before the interview has even started is a bad opening, and the
+  context needed to resolve one arrives when you're discussing that role anyway.
+- **Not material** - wording, emphasis, ordering, which bullets a given CV included,
+  formatting. Merge silently; there is nothing to resolve.
+
+When you do raise one, be neutral about it. Two CVs disagreeing is normal and usually
+means one was written quickly, not that anyone was being careless.
+
+### Step 4 — identity and writing style
+
+Extract identity (name, email, phone, location, links) from the most complete source.
+Don't ask unless something is missing or the sources disagree.
+
+Then extract their **writing style** and save it to
+`<data_root>/candidate/writing-style.json`, per `schemas/writing-style.schema.json`.
+This is what later stops generated bullets and cover letters reading as generic
+business prose. CVs give you bullet style; cover letters give you their prose voice,
+which matters more and is the only sample of it you will get.
+
+Do not show this file to the candidate or ask them to confirm it - it is stored for
+later commands to use, not a step to sit through.
+
+**Every trait needs a quote behind it.** An invented style trait produces text that is
+confidently wrong, which is worse than writing plainly. If the sample is thin - one
+short CV, no letters - say so in `notes` so later commands lean on it lightly.
+
+The `avoid` list is the one that does the most work: the words and constructions
+absent from their writing that a generator reaches for by default. Sounding like
+someone is mostly a matter of not writing "spearheaded".
+
+### Step 5 — write the file and begin
+
+Write the initial `experience.json`: `meta.status` = `"in_progress"`,
+`meta.sections_covered` = `[]`, `identity` filled in, `axes` = `[]`, `experiences` =
+the union skeleton. **Write any path with forward slashes** - see
+`skills/pipeline-safety/SKILL.md`.
+
+Then tell them what you found and start the loop with the first experience - e.g.
+"Across your three CVs I found 9 things, four of which only appear on one of them.
+I'll go through each to really understand it. We can stop anytime and pick up later."
 
 ## The interview loop (run once per experience)
 
 Ask one thing at a time - never a wall of questions in a single message.
 
+0. **Resolve any conflict recorded for this experience** (Step 3 above) before going
+   further, while the context is in front of both of you. "Your 2023 CV has this
+   ending in June and the other says September - which is right?" One question, no
+   fuss, then correct the entry and move on.
 1. **Start broad.** "Tell me about your work as [title] at [organization]. What were
    you responsible for day to day?"
 2. **Probe specifics.** Tools/technologies/methods used, notable outcomes or metrics,

@@ -78,6 +78,11 @@
             "type": "string",
             "description": "Free-text summary of the role/project context."
           },
+          "source_documents": {
+            "type": "array",
+            "description": "Which files in source-documents/ this experience appeared on. Candidates keep several CVs and write different experiences into each, so the skeleton is the union of all of them. An experience appearing on only one CV is a signal in itself - they judged it irrelevant for the others - and it helps per-application tailoring decide what to include.",
+            "items": { "type": "string" }
+          },
           "skills": {
             "type": "array",
             "items": {

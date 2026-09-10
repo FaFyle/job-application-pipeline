@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Job Application Pipeline - the candidate's writing style",
+  "description": "Extracted by /js-interview from every CV and cover letter in source-documents/, and used by /js-templates and /js-generate so generated text sounds like the candidate rather than like generic business prose. Not shown to the candidate and not confirmed with them - it exists so later sessions can reuse it, and so there is something to point at if a generated letter sounds wrong. Every trait must be traceable to something they actually wrote: an invented trait produces text that is confidently wrong, which is worse than neutral prose. Style governs HOW something is written and never licenses writing something they cannot defend - grounding still wins.",
+  "type": "object",
+  "required": ["extracted_from", "languages"],
+  "properties": {
+    "extracted_from": {
+      "type": "array",
+      "description": "Filenames in source-documents/ this was built from, and what each was read as.",
+      "items": {
+        "type": "object",
+        "required": ["file", "kind"],
+        "properties": {
+          "file": { "type": "string" },
+          "kind": { "enum": ["cv", "cover_letter", "other"] }
+        }
+      }
+    },
+    "languages": {
+      "type": "object",
+      "description": "Style keyed by language code ('en', 'fr'). Someone's English and French writing differ, and averaging them produces a voice they use in neither. Only include a language there is real evidence for.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "voice": {
+            "enum": ["first_person", "implied_subject", "third_person", "mixed"],
+            "description": "first_person = 'I led the team'; implied_subject = 'Led the team' (the usual CV convention); third_person = 'Badil led the team'."
+          },
+          "sentence_length": {
+            "type": "object",
+            "properties": {
+              "register": { "enum": ["fragments", "short", "medium", "long"] },
+              "observed_average_words": { "type": "number" }
+            }
+          },
+          "bullet_openings": {
+            "type": "array",
+            "description": "Verbs this candidate actually opens bullets with - not a list of good CV verbs.",
+            "items": { "type": "string" }
+          },
+          "tense": {
+            "type": "string",
+            "description": "Convention observed, including whether the current role is treated differently from past ones."
+          },
+          "quantification": {
+            "type": "string",
+            "description": "How often they cite numbers and how they phrase them - exact figures, approximations, ranges, or rarely at all."
+          },
+          "formality": {
+            "type": "string",
+            "description": "Register and warmth, described concretely rather than as an adjective."
+          },
+          "characteristic_phrases": {
+            "type": "array",
+            "description": "Phrasings they genuinely repeat across documents. A one-off is not a habit.",
+            "items": { "type": "string" }
+          },
+          "avoid": {
+            "type": "array",
+            "description": "Words and constructions absent from their writing that a generator would otherwise reach for by default ('leveraged', 'spearheaded', 'passionate about'). The most useful field here: matching a voice is mostly about not using the words someone never uses.",
+            "items": { "type": "string" }
+          },
+          "cover_letter_shape": {
+            "type": "object",
+            "description": "Only from real cover letters; omit when there are none.",
+            "properties": {
+              "opening_move": { "type": "string" },
+              "paragraph_count": { "type": "number" },
+              "closing_move": { "type": "string" },
+              "addresses_company_how": { "type": "string" }
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "description": "Short quotes backing the observations above, each naming its source file. A trait with no evidence should not be in this file.",
+            "items": {
+              "type": "object",
+              "required": ["trait", "quote", "file"],
+              "properties": {
+                "trait": { "type": "string" },
+                "quote": { "type": "string" },
+                "file": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Anything that didn't fit above, including uncertainty. If the sample was thin - one short CV and no cover letter - say so here, so later commands know to lean on this lightly."
+    }
+  }
+}

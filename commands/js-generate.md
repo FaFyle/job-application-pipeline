@@ -61,6 +61,18 @@ If the snapshot is missing, treat the current file as the baseline and write one
 
 This is the judgement step, and the only place the posting influences the documents.
 
+**Write in their voice.** Read `candidate/writing-style.json` (extracted from their own
+CVs and cover letters) and follow it for every bullet you reword and every line of the
+cover letter. Use the entry for the language you settled on in Step 2 — someone's
+French and English writing differ, and averaging them produces a voice they use in
+neither. Honour the `avoid` list: generic business prose is what makes generated text
+obviously generated, and "spearheaded" in a CV of someone who never writes it is
+noticed instantly. If `notes` says the sample was thin, lean on the profile lightly
+rather than inventing a voice from two bullets.
+
+Style governs *how* something is written. It never licenses a claim they cannot
+defend — grounding wins, always.
+
 Read `fit-score.json`'s `matched_requirements`. For each, `experience.json` holds the
 evidence and every experience sharing that `skill_key`. Then:
 
@@ -119,6 +131,12 @@ so instead and ask the candidate to open it.
   (`{{company}}`, `{{role}}`, `{{opening}}`, `{{body_1}}`, `{{body_2}}`,
   `{{closing}}`) using `build_cv.py`'s `replace_text` op. Ground every claim the same
   way. Save as `cover-letter.docx`; PDF is a manual print from Word, by decision.
+
+  This is where voice matters most: it is prose, and it is read as the candidate
+  speaking. Follow `writing-style.json`'s `cover_letter_shape` — their opening move,
+  how many paragraphs they write, how they address a company, how they close — rather
+  than a generic letter with their facts dropped in. If they supplied no cover letters
+  at all, say so once and write plainly instead of imitating a voice you haven't seen.
 - **Prep report**: fill `templates/prep-report-template.html`'s `JAP_PREP_DATA` block
   from `fit-score.json` and `experience.json` - matched requirements with the evidence
   behind each, unmatched ones as what to be ready to address, the commute link, and

@@ -15,7 +15,9 @@ verdict without printing one. Neither carries its own copy.
 
 | What | Where | Notes |
 |---|---|---|
+| Source documents | `source-documents/` | The candidate's own CVs and cover letters. Feeds the interview's content *and* the writing-style profile. `.docx`/`.txt`/`.md` are readable; `.pdf` is not. |
 | Knowledge base | `candidate/experience.json` | Read `meta.status`. `"in_progress"` is a **third state**, distinct from missing and from `"complete"` — the interview is resumable and saves after every experience. |
+| Writing style | `candidate/writing-style.json` | Written by the interview. Absent means generated text will read generically. |
 | Preferences | `candidate/preferences.json` | Needs, priorities, search terms |
 | Scoring config | `candidate/scoring-config.json` | Job-fit tuning |
 | Templates | `templates/cv-template.docx`, `cover-letter-template.docx`, `prep-report-template.html` | The CV is a `.docx`; an older `cv-template.html` is stale and does not count |
@@ -28,13 +30,17 @@ verdict without printing one. Neither carries its own copy.
 Take the first that applies:
 
 1. **No pointer config** -> `/js-setup`. Nothing else can run without it.
-2. **`experience.json` missing, or `meta.status` is `"in_progress"`** -> `/js-interview`.
+2. **`experience.json` missing and `source-documents/` empty** -> point them at the
+   folder first, since the interview reads it. **A prompt, not a gate**: someone with
+   no CV at all can still be interviewed from scratch, so offer to go ahead if that's
+   their situation rather than leaving them stuck.
+3. **`experience.json` missing, or `meta.status` is `"in_progress"`** -> `/js-interview`.
    If in progress, say it picks up where it left off rather than starting over.
-3. **`preferences.json` or `scoring-config.json` missing** -> `/js-preferences`.
-4. **Templates missing** -> `/js-templates`.
-5. **No scans yet** -> `/js-scan`.
-6. **A scan has prioritized jobs with no `cv.docx`** -> `/js-generate`.
-7. **Everything present** -> set up. `/js-scan` can be re-run any time for new jobs.
+4. **`preferences.json` or `scoring-config.json` missing** -> `/js-preferences`.
+5. **Templates missing** -> `/js-templates`.
+6. **No scans yet** -> `/js-scan`.
+7. **A scan has prioritized jobs with no `cv.docx`** -> `/js-generate`.
+8. **Everything present** -> set up. `/js-scan` can be re-run any time for new jobs.
 
 ## Checked at every stage, independent of the ladder
 

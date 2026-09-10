@@ -75,11 +75,32 @@ little context earns its place. Three sentences, not a wall:
   tailored applications for the good ones
 - the rough shape: an interview, some preferences, a CV template, then searches you
   can repeat
-- what it needs from them: their CV (as a `.docx`) and a photo, if their CV has one
 - **that it never applies to anything on their behalf** - it writes documents and
   stops
 
 Then go straight into `/js-setup`. Don't make them ask.
+
+## Getting their documents in, before the interview
+
+The interview reads their CVs, so this has to happen first - and it is the one moment
+the guide must be concrete rather than brief.
+
+After setup, tell them plainly:
+
+- **where**: the `source-documents/` folder inside their data folder. Give the actual
+  path, and offer to open it (`explorer` / `open` / `xdg-open`) rather than making
+  them navigate there.
+- **what**: every CV and cover letter they have - not just the newest one. Say why,
+  because it changes what they do: people write different experiences into different
+  CVs depending on the job, so several CVs mean a fuller picture, and cover letters
+  are what let later documents sound like them rather than like a form letter.
+- **which formats**: `.docx` or plain text. PDFs can't be read - they'd need to re-save
+  one as `.docx`.
+
+Then wait for them to say they're done, and check the folder before starting. If it's
+empty, say what's missing rather than launching an interview that will ask for it
+anyway. If they have nothing at all, that's fine - say the interview can build from
+scratch and go ahead.
 
 ## When something is wrong
 

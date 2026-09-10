@@ -29,11 +29,17 @@ machine.
    <data-root>/
      config.json
      candidate/
+     source-documents/  <- the candidate puts their CVs and cover letters here
      templates/
      scans/
-     inbox/       <- where the browser saves files back to
-     .tools/      <- scratch venv for docx rendering; safe to delete
+     inbox/             <- where the browser saves files back to
+     .tools/            <- scratch venv for docx rendering; safe to delete
    ```
+
+   Write a short `README.txt` inside `source-documents/` saying what belongs there:
+   every CV and cover letter they have, `.docx` or plain text (PDFs can't be read),
+   and that more is better because different CVs usually carry different experiences.
+   Someone who opens an empty folder in Explorer has nothing else to go on.
    Write `config.json` only if it doesn't already exist, with this content:
    ```json
    {

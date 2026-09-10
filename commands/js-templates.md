@@ -114,8 +114,30 @@ lot more tokens.** Default to one CV. Their choice, not yours.
 
 ## Part 1: the CV
 
-Ask for their existing CV as a `.docx`, then take one of two branches. **Say which
-branch you are on** so the candidate knows what to expect.
+Their CVs are in `<data_root>/source-documents/`, usually several of them.
+`/js-interview` already took the *content* from all of them; what you need here is one
+**design basis**, since Option A edits a document in place.
+
+**Pick it without asking when you can.** Usually every CV is the same template
+carrying different content. Compare the designs first:
+
+- page setup — size and margins, read from the raw `w:pgMar` attributes (see the
+  python-docx notes above: real CVs store non-integer twips the accessor can't parse)
+- table structure, which is how two-column CVs are built — same shape or not
+- the style names defined in the document, and the fonts on those styles, since fonts
+  are set at style level rather than on runs
+- heading treatment
+
+If they match, choose one silently — the most recent, or the most complete when dates
+are unclear — and say which in a line. **If they genuinely differ, ask which to use**,
+and make clear the choice is only about looks: the content already came from all of
+them, so nothing is lost either way. Cover letters are never a CV design basis.
+
+If everything they have is a PDF, ask for a `.docx` re-save rather than inventing a
+structure and calling it theirs.
+
+Then take one of two branches. **Say which branch you are on** so the candidate knows
+what to expect.
 
 Both branches: ask for a profile picture if the preferences say photo, store it at
 `candidate/photo.<ext>`, and place it with `add_picture`. Never invent one and never
@@ -153,6 +175,13 @@ Only if they asked for more — and these two must differ from each other on
   size and whitespace rather than boxes and shaded panels; at most one accent colour;
   no skill rating bars, star ratings or percentage meters, even if their original has
   them.
+
+**Write in their voice.** Any bullet you reword in A or B — and all of C's content —
+follows `candidate/writing-style.json`, extracted from their own CVs and cover
+letters. Respect its `avoid` list especially: a bullet that says "spearheaded" when
+they have never written the word is the fastest way to make a CV read as
+not-theirs. Style governs *how* something is written; it never licenses a claim they
+cannot defend.
 
 **Before showing B and C, render all three and look at them side by side.** If B and
 C read as the same design, C has failed and must be rebuilt, not shipped with an
